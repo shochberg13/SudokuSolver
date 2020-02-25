@@ -23,12 +23,40 @@ public class Solver {
 	
 	public void start(){
 		while(!isBoardComplete()){
-			Coord nextCoord = findNextOpenSpot(0, 0);
+			Coord currentCoord = new Coord(0, 0);
+			currentCoord = findNextOpenSpot(currentCoord);
+			int row = currentCoord.getRow();
+			int col = currentCoord.getCol();
+			
+			boolean legalMoveExists = false;
+			for (int i = 1; i <= 9; i++){
+				if (legalMove(i, currentCoord)){
+					grid[row][col] = i;
+					legalMoveExists = true;
+					break;
+				}
+			}
+			
+			if (!legalMoveExists){
+				while(!legalMoveExists){
+					currentCoord = findPrevOpenSpot(currentCoord);
+					int currentVal = grid[currentCoord.getRow()][currentCoord.getCol()];
+					for (int i = currentVal + 1; i < 9; i++){
+						if (legalMove(i, currentCoord)){
+							grid[row][col] = i;
+							legalMoveExists = true;
+							break;
+						}
+					}
+				}
+			}
 			
 		}
 	}
 	
-	public Coord findPrevOpenSpot(int currentRow, int currentCol){
+	public Coord findPrevOpenSpot(Coord currentCoord){
+		int currentRow = currentCoord.getRow();
+		int currentCol = currentCoord.getCol();
 		for (int row = currentRow; row >= 0; row--){
 			for (int col = currentCol; col >= 0; col--){
 				if (!userInput[row][col]) return new Coord(row, col);
@@ -38,7 +66,9 @@ public class Solver {
 		return null;
 	}
 	
-	public Coord findNextOpenSpot(int currentRow, int currentCol){
+	public Coord findNextOpenSpot(Coord currentCoord){
+		int currentRow = currentCoord.getRow();
+		int currentCol = currentCoord.getCol();
 		for (int row = currentRow; row < 9; row++){
 			for (int col = currentCol; col < 9; col++){
 				if (grid[row][col] == 0) return new Coord(row, col);
@@ -48,7 +78,10 @@ public class Solver {
 		return null;
 	}
 
-	public boolean legalMove(int val, int row, int col){
+	public boolean legalMove(int val, Coord coord){
+		
+		int row = coord.getRow();
+		int col = coord.getCol();
 		
 		// Check row and column
 		for (int i = 0; i < 9; i++){
@@ -70,7 +103,7 @@ public class Solver {
 	}
 	
 	public boolean isBoardComplete(){
-		if (findNextOpenSpot(0,0) == null) return true;
+		if (findNextOpenSpot(new Coord(0,0)) == null) return true;
 		return false;
 	}
 	
