@@ -59,9 +59,18 @@ public class UserInterface {
 	public void printMatrix(){
 		for (int i = 0; i < grid.length; i++){
 			for (int j = 0; j < grid[i].length; j++){
-				System.out.print(grid[i][j] + "\t");
+				System.out.print(grid[i][j]);
+				if(j % 3 == 2) {
+					System.out.print("   |    ");
+				}else{
+					System.out.print("\t");
+				}
 			}
-			System.out.println();
+			if(i % 3 == 2) {
+				System.out.println("\n__________________________________________________________________");
+			}else{
+				System.out.println("\n");
+			}
 		}
 	}
 	

@@ -37,13 +37,17 @@ public class Solver {
 				}
 			}
 			
+			printMatrix();
+			
 			if (!legalMoveExists){
 				while(!legalMoveExists){
 					currentCoord = findPrevOpenSpot(currentCoord);
+					int prevRow = currentCoord.getRow();
+					int prevCol = currentCoord.getCol();
 					int currentVal = grid[currentCoord.getRow()][currentCoord.getCol()];
 					for (int i = currentVal + 1; i < 9; i++){
 						if (legalMove(i, currentCoord)){
-							grid[row][col] = i;
+							grid[prevRow][prevCol] = i;
 							legalMoveExists = true;
 							break;
 						}
@@ -57,12 +61,32 @@ public class Solver {
 	public Coord findPrevOpenSpot(Coord currentCoord){
 		int currentRow = currentCoord.getRow();
 		int currentCol = currentCoord.getCol();
+		
+		//Go to previous spot
+		if (currentCol != 0) {
+			currentCol--;
+		}else{
+			currentRow --;
+			currentCol = 8;
+		}
+		
 		for (int row = currentRow; row >= 0; row--){
 			for (int col = currentCol; col >= 0; col--){
-				if (!userInput[row][col]) return new Coord(row, col);
+				if (!userInput[row][col]) {
+					
+					System.out.println("Current: " + currentCoord);
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					System.out.println("FOUND");
+					return new Coord(row, col);
+				}
 			}
 		}
-		System.out.println("No spots left");
+		System.out.println("No spots left (error)");
 		return null;
 	}
 	
@@ -142,6 +166,7 @@ public class Solver {
 	 * @param box: 1 for top left, 2 top center, ... , 9 for bottom right
 	 */
 	public boolean isSmallBoxSolved(int box){
+
 		// Convert box number into top left coordinate of the box
 		int rowStart = 1;
 		if (box < 4) rowStart = 0;
@@ -162,4 +187,25 @@ public class Solver {
 		if (repeatCheck.size() == 9) return true;
 		return false;
 	}
+	
+	
+	public void printMatrix(){
+		System.out.println("\n\n");
+		for (int i = 0; i < grid.length; i++){
+			for (int j = 0; j < grid[i].length; j++){
+				System.out.print(grid[i][j]);
+				if(j % 3 == 2) {
+					System.out.print("   |    ");
+				}else{
+					System.out.print("\t");
+				}
+			}
+			if(i % 3 == 2) {
+				System.out.println("\n__________________________________________________________________");
+			}else{
+				System.out.println("\n");
+			}
+		}
+	}
+	
 }
