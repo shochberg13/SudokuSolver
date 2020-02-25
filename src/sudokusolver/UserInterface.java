@@ -7,6 +7,17 @@ public class UserInterface {
 		this.grid = new int[9][9];
 	}
 
+	public void solve(){
+		createSamplePuzzle();
+		printMatrix();
+		Solver solver = new Solver(grid);
+		
+		System.out.println("\nSolving...\n");
+		solver.start();
+		
+		printMatrix();
+	}
+	
 	public void createSamplePuzzle() {
 
 		// Future iterations would let user input numbers
