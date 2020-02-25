@@ -4,26 +4,73 @@ import java.util.HashSet;
 
 public class Solver {
 	private int[][] grid;
+	private boolean[][] userInput;
 	
 	public Solver(int[][] grid){
 		this.grid = grid;
+		this.userInput = new boolean[9][9];
+		
+		for (int i = 0; i < 9; i ++){
+			for(int j = 0; j < 9; j++){
+				if (this.grid[i][j] != 0){
+					userInput[i][j] = true;
+				}else{
+					userInput[i][j] = false;
+				}
+			}
+		}
 	}
 	
+	public void start(){
+		while(!isBoardComplete()){
+			Coord nextCoord = findNextOpenSpot(0, 0);
+			
+		}
+	}
 	
+	public Coord findPrevOpenSpot(int currentRow, int currentCol){
+		for (int row = currentRow; row >= 0; row--){
+			for (int col = currentCol; col >= 0; col--){
+				if (!userInput[row][col]) return new Coord(row, col);
+			}
+		}
+		System.out.println("No spots left");
+		return null;
+	}
 	
-	
-	public int findNextOpenSpot(){
-		for (int row = 0; row < 9; row++){
-			for (int col = 0; col < 9; col++){
-				if (grid[row][col] == 0) return row * 9 + col;
+	public Coord findNextOpenSpot(int currentRow, int currentCol){
+		for (int row = currentRow; row < 9; row++){
+			for (int col = currentCol; col < 9; col++){
+				if (grid[row][col] == 0) return new Coord(row, col);
 			}
 		}
 		System.out.println("Board is complete");
-		return -1;
+		return null;
 	}
 
+	public boolean legalMove(int val, int row, int col){
+		
+		// Check row and column
+		for (int i = 0; i < 9; i++){
+			if (grid[i][col] == val) return false;
+			if (grid[row][i] == val) return false;
+		}
+		
+		// Check Box (Start by finding top left corner of small box)
+		int rowStart = row - (row % 3);
+		int colStart = col - (col % 3);
+		
+		for (int i = 0; i < 3; i++){
+			for (int j = 0; j < 3; j++){
+				if (grid[rowStart + i][colStart + j] == val) return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	public boolean isBoardComplete(){
-		if (findNextOpenSpot() == -1) return true;
+		if (findNextOpenSpot(0,0) == null) return true;
 		return false;
 	}
 	
