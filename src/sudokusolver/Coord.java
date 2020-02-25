@@ -17,4 +17,8 @@ public class Coord {
 	public int getCol(){
 		return this.col;
 	}
+	
+	public String toString(){
+		return "row: " + this.row + "\tcol: " + this.col;
+	}
 }
