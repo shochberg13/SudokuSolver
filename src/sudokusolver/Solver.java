@@ -28,29 +28,27 @@ public class Solver {
 			int row = currentCoord.getRow();
 			int col = currentCoord.getCol();
 			
-			boolean legalMoveExists = false;
+			boolean needToBackTrack = true;
 			for (int i = 1; i <= 9; i++){
 				if (legalMove(i, currentCoord)){
 					grid[row][col] = i;
-					legalMoveExists = true;
+					needToBackTrack = false;
 					break;
 				}
 			}
 			
 			printMatrix();
 			
-			if (!legalMoveExists){
-				while(!legalMoveExists){
-					currentCoord = findPrevOpenSpot(currentCoord);
-					int prevRow = currentCoord.getRow();
-					int prevCol = currentCoord.getCol();
-					int currentVal = grid[currentCoord.getRow()][currentCoord.getCol()];
-					for (int i = currentVal + 1; i < 9; i++){
-						if (legalMove(i, currentCoord)){
-							grid[prevRow][prevCol] = i;
-							legalMoveExists = true;
-							break;
-						}
+			
+			while(needToBackTrack){
+				currentCoord = findPrevOpenSpot(currentCoord);
+				int prevRow = currentCoord.getRow();
+				int prevCol = currentCoord.getCol();
+				for (int i = 1; i < 9; i++){
+					if (legalMove(i, currentCoord)){
+						grid[prevRow][prevCol] = i;
+						needToBackTrack = false;
+						break;
 					}
 				}
 			}
