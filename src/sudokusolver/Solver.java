@@ -1,6 +1,8 @@
 package sudokusolver;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class Solver {
 	private int[][] grid;
@@ -21,37 +23,66 @@ public class Solver {
 		}
 	}
 	
+	
+	
 	public void start(){
+		
+		boolean[][][] historyMatrix = new boolean[9][9][9];
+		
+		
 		while(!isBoardComplete()){
-			Coord currentCoord = new Coord(0, 0);
-			currentCoord = findNextOpenSpot(currentCoord);
-			int row = currentCoord.getRow();
-			int col = currentCoord.getCol();
 			
-			boolean needToBackTrack = true;
-			for (int i = 1; i <= 9; i++){
-				if (legalMove(i, currentCoord)){
-					grid[row][col] = i;
-					needToBackTrack = false;
-					break;
-				}
-			}
+			int foundNextNumber = 0;
+			clearMatrix(historyMatrix);
 			
-			printMatrix();
+			while(foundNextNumber <= 0){
 			
-			
-			while(needToBackTrack){
-				currentCoord = findPrevOpenSpot(currentCoord);
-				int prevRow = currentCoord.getRow();
-				int prevCol = currentCoord.getCol();
-				for (int i = 1; i < 9; i++){
+				Coord currentCoord = new Coord(0, 0);
+				currentCoord = findNextOpenSpot(currentCoord);
+				int row = currentCoord.getRow();
+				int col = currentCoord.getCol();
+				
+				boolean needToBackTrack = true;
+				for (int i = 1; i <= 9; i++){
 					if (legalMove(i, currentCoord)){
-						grid[prevRow][prevCol] = i;
+						grid[row][col] = i;
+						foundNextNumber ++;
 						needToBackTrack = false;
 						break;
 					}
-					// Resets value if nothing works
+				}
+				
+				printMatrix();
+				
+				
+				outerloop:
+				while(needToBackTrack){
+					System.out.println("Need to backtrack.");
+					currentCoord = findPrevOpenSpot(currentCoord);
+					foundNextNumber --;
+					int prevRow = currentCoord.getRow();
+					int prevCol = currentCoord.getCol();
+					int prevVal = grid[prevRow][prevCol];
+					historyMatrix[prevRow][prevCol][prevVal - 1] = true;
+					
+					for (int i = 1; i <= 9; i++){
+						if (historyMatrix[prevRow][prevCol][i - 1] == true) continue;
+						if (legalMove(i, currentCoord)){
+							grid[prevRow][prevCol] = i;
+							
+							
+							printMatrix();
+							needToBackTrack = false;
+							break outerloop;
+						}
+					}
+					
+					// Resets value and store value in history if nothing works
+					historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 					grid[prevRow][prevCol] = 0;
+					printMatrix();
+
+					
 				}
 			}
 		}
@@ -194,6 +225,17 @@ public class Solver {
 		return false;
 	}
 	
+	
+
+	public void clearMatrix(boolean[][][] matrix){
+		for (int i = 0; i < matrix.length; i++){
+			for (int j = 0; j < matrix[i].length; j++){
+				for (int k = 0; k < matrix[i][j].length; k++){
+					matrix[i][j][k] = false;
+				}
+			}
+		}
+	}
 	
 	public void printMatrix(){
 		System.out.println("\n\n");
