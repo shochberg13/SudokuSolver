@@ -50,9 +50,10 @@ public class Solver {
 						needToBackTrack = false;
 						break;
 					}
+					// Resets value if nothing works
+					grid[prevRow][prevCol] = 0;
 				}
 			}
-			
 		}
 	}
 	
