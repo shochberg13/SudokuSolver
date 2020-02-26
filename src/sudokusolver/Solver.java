@@ -1,8 +1,6 @@
 package sudokusolver;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 public class Solver {
 	private int[][] grid;
@@ -32,10 +30,12 @@ public class Solver {
 		
 		while(!isBoardComplete()){
 			
-			int foundNextNumber = 0;
+			int backtrackingCounter = 0;
+			System.out.println("Backtracking Counter = " + backtrackingCounter);
+			System.out.println("CLEARING HISTORY!");
 			clearMatrix(historyMatrix);
 			
-			while(foundNextNumber <= 0){
+			while(backtrackingCounter <= 0){
 			
 				Coord currentCoord = new Coord(0, 0);
 				currentCoord = findNextOpenSpot(currentCoord);
@@ -46,7 +46,8 @@ public class Solver {
 				for (int i = 1; i <= 9; i++){
 					if (legalMove(i, currentCoord)){
 						grid[row][col] = i;
-						foundNextNumber ++;
+						backtrackingCounter ++;
+						System.out.println("Backtracking Counter = " + backtrackingCounter);
 						needToBackTrack = false;
 						break;
 					}
@@ -59,16 +60,23 @@ public class Solver {
 				while(needToBackTrack){
 					System.out.println("Need to backtrack.");
 					currentCoord = findPrevOpenSpot(currentCoord);
-					foundNextNumber --;
+					backtrackingCounter --;
+					System.out.println("Backtracking Counter = " + backtrackingCounter);
 					int prevRow = currentCoord.getRow();
 					int prevCol = currentCoord.getCol();
 					int prevVal = grid[prevRow][prevCol];
 					historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 					
 					for (int i = 1; i <= 9; i++){
-						if (historyMatrix[prevRow][prevCol][i - 1] == true) continue;
+						if (historyMatrix[prevRow][prevCol][i - 1] == true){
+							System.out.println("Skipping the value: " + i + "(because we've done it already)");
+							continue;
+						}
+						System.out.println("Trying the value " + i + "(because we have not done it yet)");
 						if (legalMove(i, currentCoord)){
 							grid[prevRow][prevCol] = i;
+							backtrackingCounter++;
+							System.out.println("Backtracking Counter = " + backtrackingCounter);
 							
 							
 							printMatrix();
@@ -80,9 +88,8 @@ public class Solver {
 					// Resets value and store value in history if nothing works
 					historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 					grid[prevRow][prevCol] = 0;
-					printMatrix();
 
-					
+					printMatrix();
 				}
 			}
 		}
@@ -112,13 +119,13 @@ public class Solver {
 				
 				
 				if (!userInput[row][col]) {
-					System.out.println("Found an open spot: " + currentCoord);
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					System.out.println("Found an open spot: " + new Coord(row, col));
+//					try {
+//						Thread.sleep(500);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
 					return new Coord(row, col);
 				}
 			}
@@ -138,6 +145,7 @@ public class Solver {
 		System.out.println("Board is complete");
 		return null;
 	}
+	
 
 	public boolean legalMove(int val, Coord coord){
 		
@@ -146,8 +154,14 @@ public class Solver {
 		
 		// Check row and column
 		for (int i = 0; i < 9; i++){
-			if (grid[i][col] == val) return false;
-			if (grid[row][i] == val) return false;
+			if (grid[i][col] == val) {
+				System.out.println("Matched " + val + " in the same column! Culprit location: [" + i + "," + col + "]");
+				return false;
+			}
+			if (grid[row][i] == val) {
+				System.out.println("Matched " + val + "  in the same row! Culprit location: [" + row + "," + i + "]");
+				return false;
+			}
 		}
 		
 		// Check Box (Start by finding top left corner of small box)
@@ -156,7 +170,10 @@ public class Solver {
 		
 		for (int i = 0; i < 3; i++){
 			for (int j = 0; j < 3; j++){
-				if (grid[rowStart + i][colStart + j] == val) return false;
+				if (grid[rowStart + i][colStart + j] == val) {
+					System.out.println("Matched " + val + "  in the same box! Culprit location (within small box: [" + i + "," + j + "]");
+					return false;
+				}
 			}
 		}
 		
@@ -197,6 +214,7 @@ public class Solver {
 		if (repeatCheck.size() == 9) return true;
 		return false;
 	}
+	
 	
 	/**
 	 * 
