@@ -27,46 +27,41 @@ public class Solver {
 		
 		boolean[][][] historyMatrix = new boolean[9][9][9];
 		
-		
+		int backtrackingCounter;
 		while(!isBoardComplete()){
+			// GO FORWARD
+			Coord currentCoord = new Coord(0, 0);
+			currentCoord = findNextOpenSpot(currentCoord);
+			int row = currentCoord.getRow();
+			int col = currentCoord.getCol();
 			
-			int backtrackingCounter = 0;
-			System.out.println("Backtracking Counter = " + backtrackingCounter);
-			System.out.println("CLEARING HISTORY!");
-			clearMatrix(historyMatrix);
-			
-			while(backtrackingCounter <= 0){
-			
-				Coord currentCoord = new Coord(0, 0);
-				currentCoord = findNextOpenSpot(currentCoord);
-				int row = currentCoord.getRow();
-				int col = currentCoord.getCol();
-				
-				boolean needToBackTrack = true;
-				for (int i = 1; i <= 9; i++){
-					if (legalMove(i, currentCoord)){
-						grid[row][col] = i;
-						backtrackingCounter ++;
-						System.out.println("Backtracking Counter = " + backtrackingCounter);
-						needToBackTrack = false;
-						break;
-					}
+			boolean needToBackTrack = true;
+			for (int i = 1; i <= 9; i++){
+				if (legalMove(i, currentCoord)){
+					grid[row][col] = i;
+					needToBackTrack = false;
+					break;
 				}
+			}
+			
+			printMatrix();
+			
+			// BACKTRACKING
+			if(needToBackTrack){
+				backtrackingCounter = 0;
 				
-				printMatrix();
-				
-				
-				outerloop:
-				while(needToBackTrack){
+				clearMatrix(historyMatrix);
+				outerloop: do {
 					System.out.println("Need to backtrack.");
 					currentCoord = findPrevOpenSpot(currentCoord);
-					backtrackingCounter --;
+					backtrackingCounter--;
 					System.out.println("Backtracking Counter = " + backtrackingCounter);
 					int prevRow = currentCoord.getRow();
 					int prevCol = currentCoord.getCol();
 					int prevVal = grid[prevRow][prevCol];
 					historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 					
+					boolean resetNeeded = true;
 					for (int i = 1; i <= 9; i++){
 						if (historyMatrix[prevRow][prevCol][i - 1] == true){
 							System.out.println("Skipping the value: " + i + "(because we've done it already)");
@@ -74,23 +69,28 @@ public class Solver {
 						}
 						System.out.println("Trying the value " + i + "(because we have not done it yet)");
 						if (legalMove(i, currentCoord)){
+							resetNeeded = false;
 							grid[prevRow][prevCol] = i;
 							backtrackingCounter++;
-							System.out.println("Backtracking Counter = " + backtrackingCounter);
-							
-							
+							System.out.println("Increased backtracker by 1. It is now " + backtrackingCounter);
 							printMatrix();
-							needToBackTrack = false;
-							break outerloop;
+							
+							if (backtrackingCounter == 0){
+								System.out.println("CLEAR HISTORY!");
+								clearMatrix(historyMatrix);
+								break outerloop;
+							}
+							break;
 						}
 					}
-					
-					// Resets value and store value in history if nothing works
-					historyMatrix[prevRow][prevCol][prevVal - 1] = true;
-					grid[prevRow][prevCol] = 0;
 
-					printMatrix();
-				}
+					// Resets value and store value in history if nothing works
+					if (resetNeeded){
+						historyMatrix[prevRow][prevCol][prevVal - 1] = true;
+						grid[prevRow][prevCol] = 0;
+						printMatrix();
+					}
+				}while(backtrackingCounter < 0);
 			}
 		}
 	}
@@ -120,12 +120,12 @@ public class Solver {
 				
 				if (!userInput[row][col]) {
 					System.out.println("Found an open spot: " + new Coord(row, col));
-//					try {
-//						Thread.sleep(500);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					return new Coord(row, col);
 				}
 			}
