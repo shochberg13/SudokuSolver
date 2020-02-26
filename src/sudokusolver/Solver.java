@@ -70,18 +70,25 @@ public class Solver {
 			currentCol = 8;
 		}
 		
+		boolean beginningSearch = true;
 		for (int row = currentRow; row >= 0; row--){
-			for (int col = currentCol; col >= 0; col--){
+			for (int col = 8; col >= 0; col--){
+				
+				// EX: if starting at (3, 6), I do not need to inspect (3, 7) and (3, 8)
+				if (beginningSearch) {
+					col = currentCol;
+					beginningSearch = false;
+				}
+				
+				
 				if (!userInput[row][col]) {
-					
-					System.out.println("Current: " + currentCoord);
+					System.out.println("Found an open spot: " + currentCoord);
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					System.out.println("FOUND");
 					return new Coord(row, col);
 				}
 			}
