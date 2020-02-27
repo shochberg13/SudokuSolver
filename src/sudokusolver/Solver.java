@@ -33,9 +33,9 @@ public class Solver {
 		while(!isBoardComplete()){
 
 			// Go Forward
-			
 			forwardTrack();
 			needToBackTrack = !ableToWriteNumber;
+			printMatrix();
 			
 			// If need to backtrack, then backtrack until good number is found, 
 			// then forward track until back at original spot. 
@@ -47,12 +47,14 @@ public class Solver {
 				do {
 					do {
 						backTrack();
+						printMatrix();
 						backtrackingCounter++;
 					}while(ableToWriteNumber);
 					backtrackingCounter--;
 					
 					do {
 						forwardTrack();
+						printMatrix();
 						backtrackingCounter--;
 					}while(ableToWriteNumber);
 					backtrackingCounter++;
@@ -93,6 +95,7 @@ public class Solver {
 			if (legalMove(i, currentCoord)){
 				grid[row][col] = i;
 				ableToWriteNumber = true;
+				break;
 			}
 		}
 		grid[row][col] = 0;
