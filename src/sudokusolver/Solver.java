@@ -6,11 +6,13 @@ public class Solver {
 	private int[][] grid;
 	private boolean[][] userInput;
 	private boolean[][][] historyMatrix;
+	private boolean ableToWriteNumber;
 	
 	public Solver(int[][] grid){
 		this.grid = grid;
 		this.historyMatrix = new boolean[9][9][9];
 		this.userInput = new boolean[9][9];
+		this.ableToWriteNumber = true;
 		
 		for (int i = 0; i < 9; i ++){
 			for(int j = 0; j < 9; j++){
@@ -27,33 +29,34 @@ public class Solver {
 	
 	public void start(){
 		
-		
+		boolean needToBackTrack;
 		while(!isBoardComplete()){
 
 			// Go Forward
-			boolean needToBackTrack = true;
-			if (forwardTrack()){
-				needToBackTrack = false;
-			}
-				
+			
+			forwardTrack();
+			needToBackTrack = !ableToWriteNumber;
 			
 			// If need to backtrack, then backtrack until good number is found, 
 			// then forward track until back at original spot. 
 			if(needToBackTrack){
+
 				int backtrackingCounter = 0;
 				clearMatrix(historyMatrix);
 
-				
 				do {
-					if (backTrack()){
-						backtrackingCounter ++;
-						forwardTrack();
-
-					}else{
+					do {
 						backTrack();
+						backtrackingCounter++;
+					}while(ableToWriteNumber);
+					backtrackingCounter--;
+					
+					do {
+						forwardTrack();
 						backtrackingCounter--;
-						
-					}
+					}while(ableToWriteNumber);
+					backtrackingCounter++;
+					
 				}while(backtrackingCounter > 0);
 				
 			}
@@ -63,13 +66,13 @@ public class Solver {
 	}
 	
 	
-	public boolean forwardTrack(){
+	public void forwardTrack(){
 		Coord currentCoord = findNextOpenSpot(new Coord(0,0));
-		return tryAllValues(currentCoord);
+		tryAllValues(currentCoord);
 	}
 	
 	
-	public boolean backTrack(){
+	public void backTrack(){
 		
 		Coord backTrackCoord = findPrevOpenSpot();
 		int prevRow = backTrackCoord.getRow();
@@ -77,11 +80,11 @@ public class Solver {
 		int prevVal = grid[prevRow][prevCol];
 		historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 		
-		return tryAllValues(backTrackCoord);
+		tryAllValues(backTrackCoord);
 	}
 	
 	
-	public boolean tryAllValues(Coord currentCoord){
+	public void tryAllValues(Coord currentCoord){
 		int row = currentCoord.getRow();
 		int col = currentCoord.getCol();
 		for (int i = 1; i <= 9; i++){
@@ -89,11 +92,11 @@ public class Solver {
 
 			if (legalMove(i, currentCoord)){
 				grid[row][col] = i;
-				return true;
+				ableToWriteNumber = true;
 			}
 		}
 		grid[row][col] = 0;
-		return false;
+		ableToWriteNumber = false;
 	}
 	
 	
