@@ -30,8 +30,10 @@ public class Solver {
 	public void start(){
 		
 		boolean needToBackTrack;
+		
+		int spot = 0;
 		while(!isBoardComplete()){
-
+			System.out.println("SPOT: " + (++spot));
 			// Go Forward
 			forwardTrack();
 			needToBackTrack = !ableToWriteNumber;
@@ -42,22 +44,24 @@ public class Solver {
 			if(needToBackTrack){
 
 				int backtrackingCounter = 0;
+				System.out.println("BacktrackCounter: " + backtrackingCounter);
 				clearMatrix(historyMatrix);
 
+				
 				do {
 					do {
 						backTrack();
 						printMatrix();
-						backtrackingCounter++;
-					}while(ableToWriteNumber);
-					backtrackingCounter--;
+						if (!ableToWriteNumber)backtrackingCounter++;
+						System.out.println("BacktrackCounter: " + backtrackingCounter);
+					}while(!ableToWriteNumber);
 					
 					do {
 						forwardTrack();
 						printMatrix();
-						backtrackingCounter--;
+						if(ableToWriteNumber) backtrackingCounter--;
+						System.out.println("BacktrackCounter: " + backtrackingCounter);
 					}while(ableToWriteNumber);
-					backtrackingCounter++;
 					
 				}while(backtrackingCounter > 0);
 				
@@ -69,19 +73,22 @@ public class Solver {
 	
 	
 	public void forwardTrack(){
-		Coord currentCoord = findNextOpenSpot(new Coord(0,0));
+		System.out.println("Going forward!");
+		Coord currentCoord = findNextOpenSpot();
+		System.out.println("Now trying all values at " + currentCoord);
 		tryAllValues(currentCoord);
 	}
 	
 	
 	public void backTrack(){
-		
+		System.out.println("Going backwards!");
 		Coord backTrackCoord = findPrevOpenSpot();
 		int prevRow = backTrackCoord.getRow();
 		int prevCol = backTrackCoord.getCol();
 		int prevVal = grid[prevRow][prevCol];
 		historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 		
+		System.out.println("Now trying all values at " + backTrackCoord);
 		tryAllValues(backTrackCoord);
 	}
 	
@@ -90,12 +97,19 @@ public class Solver {
 		int row = currentCoord.getRow();
 		int col = currentCoord.getCol();
 		for (int i = 1; i <= 9; i++){
-			if (historyMatrix[row][col][i - 1] == true) continue;
+			if (historyMatrix[row][col][i - 1] == true){
+				System.out.println("Skip: " + i);
+				continue;
+			}else {
+				System.out.println("Try: " + i);
+			}
+			
 
 			if (legalMove(i, currentCoord)){
 				grid[row][col] = i;
 				ableToWriteNumber = true;
-				break;
+				System.out.println("SUCCESS");
+				return;
 			}
 		}
 		grid[row][col] = 0;
@@ -104,7 +118,7 @@ public class Solver {
 	
 	
 	public Coord findPrevOpenSpot(){
-		Coord currentCoord = findNextOpenSpot(new Coord(0,0));
+		Coord currentCoord = findNextOpenSpot();
 		
 		int currentRow = currentCoord.getRow();
 		int currentCol = currentCoord.getCol();
@@ -138,11 +152,10 @@ public class Solver {
 		return null;
 	}
 	
-	public Coord findNextOpenSpot(Coord currentCoord){
-		int currentRow = currentCoord.getRow();
-		int currentCol = currentCoord.getCol();
-		for (int row = currentRow; row < 9; row++){
-			for (int col = currentCol; col < 9; col++){
+	public Coord findNextOpenSpot(){
+		
+		for (int row = 0; row < 9; row++){
+			for (int col = 0; col < 9; col++){
 				if (grid[row][col] == 0) return new Coord(row, col);
 			}
 		}
@@ -185,7 +198,7 @@ public class Solver {
 	}
 	
 	public boolean isBoardComplete(){
-		if (findNextOpenSpot(new Coord(0,0)) == null) return true;
+		if (findNextOpenSpot() == null) return true;
 		return false;
 	}
 	
@@ -271,7 +284,7 @@ public class Solver {
 				}
 			}
 			if(i % 3 == 2) {
-				System.out.println("\n__________________________________________________________________");
+				System.out.println("\n____________________________________________________________________");
 			}else{
 				System.out.println("\n");
 			}
