@@ -37,49 +37,29 @@ public class Solver {
 			}
 				
 			
-			// Backtrack as needed, then return to original spot
-						
+			// If need to backtrack, then backtrack until good number is found, 
+			// then forward track until back at original spot. 
 			if(needToBackTrack){
 				int backtrackingCounter = 0;
 				clearMatrix(historyMatrix);
 
 				
-				backTrack();
-				// Backtrack and come back until we're back to where we started
 				do {
-					
-					
-					// Backtrack
+					if (backTrack()){
+						backtrackingCounter ++;
+						forwardTrack();
 
-					
-					// Forwardtrack
-					boolean noValuesWorked = true;
-					for (int i = 1; i <= 9; i++){
-						if (historyMatrix[prevRow][prevCol][i - 1] == true) continue;
+					}else{
+						backTrack();
+						backtrackingCounter--;
 						
-						// If i found a value, I can go forward
-						if (legalMove(i, currentCoord)){
-							noValuesWorked = false;
-							needToBackTrack = false;
-							grid[prevRow][prevCol] = i;
-							backtrackingCounter--;
-							printMatrix();
-							break;
-						}
-					}
-					
-					// Resets value and store value in history if nothing works
-					if (noValuesWorked){
-						historyMatrix[prevRow][prevCol][prevVal - 1] = true;
-						grid[prevRow][prevCol] = 0;
-						printMatrix();
 					}
 				}while(backtrackingCounter > 0);
 				
-				
-				
 			}
 		}
+		
+		printMatrix();
 	}
 	
 	
@@ -112,6 +92,7 @@ public class Solver {
 				return true;
 			}
 		}
+		grid[row][col] = 0;
 		return false;
 	}
 	
