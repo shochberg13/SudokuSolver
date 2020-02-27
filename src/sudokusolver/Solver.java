@@ -5,9 +5,11 @@ import java.util.HashSet;
 public class Solver {
 	private int[][] grid;
 	private boolean[][] userInput;
+	private boolean[][][] historyMatrix;
 	
 	public Solver(int[][] grid){
 		this.grid = grid;
+		this.historyMatrix = new boolean[9][9][9];
 		this.userInput = new boolean[9][9];
 		
 		for (int i = 0; i < 9; i ++){
@@ -25,77 +27,98 @@ public class Solver {
 	
 	public void start(){
 		
-		boolean[][][] historyMatrix = new boolean[9][9][9];
 		
-		int backtrackingCounter;
 		while(!isBoardComplete()){
-			// GO FORWARD
-			Coord currentCoord = new Coord(0, 0);
-			currentCoord = findNextOpenSpot(currentCoord);
-			int row = currentCoord.getRow();
-			int col = currentCoord.getCol();
-			
+
+			// Go Forward
 			boolean needToBackTrack = true;
-			for (int i = 1; i <= 9; i++){
-				if (legalMove(i, currentCoord)){
-					grid[row][col] = i;
-					needToBackTrack = false;
-					break;
-				}
+			if (forwardTrack()){
+				needToBackTrack = false;
 			}
-			
-			printMatrix();
-			
-			// BACKTRACKING
-			if(needToBackTrack){
-				backtrackingCounter = 0;
 				
+			
+			// Backtrack as needed, then return to original spot
+						
+			if(needToBackTrack){
+				int backtrackingCounter = 0;
 				clearMatrix(historyMatrix);
-				outerloop: do {
-					System.out.println("Need to backtrack.");
-					currentCoord = findPrevOpenSpot(currentCoord);
-					backtrackingCounter--;
-					System.out.println("Backtracking Counter = " + backtrackingCounter);
-					int prevRow = currentCoord.getRow();
-					int prevCol = currentCoord.getCol();
-					int prevVal = grid[prevRow][prevCol];
-					historyMatrix[prevRow][prevCol][prevVal - 1] = true;
+
+				
+				backTrack();
+				// Backtrack and come back until we're back to where we started
+				do {
 					
-					boolean resetNeeded = true;
+					
+					// Backtrack
+
+					
+					// Forwardtrack
+					boolean noValuesWorked = true;
 					for (int i = 1; i <= 9; i++){
-						if (historyMatrix[prevRow][prevCol][i - 1] == true){
-							System.out.println("Skipping the value: " + i + "(because we've done it already)");
-							continue;
-						}
-						System.out.println("Trying the value " + i + "(because we have not done it yet)");
+						if (historyMatrix[prevRow][prevCol][i - 1] == true) continue;
+						
+						// If i found a value, I can go forward
 						if (legalMove(i, currentCoord)){
-							resetNeeded = false;
+							noValuesWorked = false;
+							needToBackTrack = false;
 							grid[prevRow][prevCol] = i;
-							backtrackingCounter++;
-							System.out.println("Increased backtracker by 1. It is now " + backtrackingCounter);
+							backtrackingCounter--;
 							printMatrix();
-							
-							if (backtrackingCounter == 0){
-								System.out.println("CLEAR HISTORY!");
-								clearMatrix(historyMatrix);
-								break outerloop;
-							}
 							break;
 						}
 					}
-
+					
 					// Resets value and store value in history if nothing works
-					if (resetNeeded){
+					if (noValuesWorked){
 						historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 						grid[prevRow][prevCol] = 0;
 						printMatrix();
 					}
-				}while(backtrackingCounter < 0);
+				}while(backtrackingCounter > 0);
+				
+				
+				
 			}
 		}
 	}
 	
-	public Coord findPrevOpenSpot(Coord currentCoord){
+	
+	public boolean forwardTrack(){
+		Coord currentCoord = findNextOpenSpot(new Coord(0,0));
+		return tryAllValues(currentCoord);
+	}
+	
+	
+	public boolean backTrack(){
+		
+		Coord backTrackCoord = findPrevOpenSpot();
+		int prevRow = backTrackCoord.getRow();
+		int prevCol = backTrackCoord.getCol();
+		int prevVal = grid[prevRow][prevCol];
+		historyMatrix[prevRow][prevCol][prevVal - 1] = true;
+		
+		return tryAllValues(backTrackCoord);
+	}
+	
+	
+	public boolean tryAllValues(Coord currentCoord){
+		int row = currentCoord.getRow();
+		int col = currentCoord.getCol();
+		for (int i = 1; i <= 9; i++){
+			if (historyMatrix[row][col][i - 1] == true) continue;
+
+			if (legalMove(i, currentCoord)){
+				grid[row][col] = i;
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	public Coord findPrevOpenSpot(){
+		Coord currentCoord = findNextOpenSpot(new Coord(0,0));
+		
 		int currentRow = currentCoord.getRow();
 		int currentCol = currentCoord.getCol();
 		
@@ -107,25 +130,19 @@ public class Solver {
 			currentCol = 8;
 		}
 		
+		// Find previous spot that was not occupied by user input
 		boolean beginningSearch = true;
 		for (int row = currentRow; row >= 0; row--){
 			for (int col = 8; col >= 0; col--){
 				
-				// EX: if starting at (3, 6), I do not need to inspect (3, 7) and (3, 8)
+				// EXAMPLE: if starting at (3, 6), I do not need to inspect (3, 7) and (3, 8)
 				if (beginningSearch) {
 					col = currentCol;
 					beginningSearch = false;
 				}
 				
-				
 				if (!userInput[row][col]) {
 					System.out.println("Found an open spot: " + new Coord(row, col));
-					try {
-						Thread.sleep(200);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 					return new Coord(row, col);
 				}
 			}
