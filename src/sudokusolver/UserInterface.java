@@ -10,12 +10,13 @@ public class UserInterface {
 	public void solve(){
 		createSamplePuzzle();
 		printMatrix();
-		BruteForceSolver solver = new BruteForceSolver(grid);
+		BruteForceSolver BFsolver = new BruteForceSolver(grid);
+		POESolver POEsolver = new POESolver(grid); 
 		
 		System.out.println("\nSolving...\n");
 		System.out.println("====================================================");
 		double timeStart = System.currentTimeMillis();
-		solver.run();
+		POEsolver.run();
 		double timeElapsed = (double)(System.currentTimeMillis() - timeStart) / 1000.000;
 		System.out.println("\n\n\nSOLVED in " + timeElapsed + " seconds \n\n");
 		printMatrix();
