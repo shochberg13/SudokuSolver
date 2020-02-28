@@ -10,7 +10,7 @@ public class UserInterface {
 	public void solve(){
 		createSamplePuzzle();
 		printMatrix();
-		Solver solver = new Solver(grid);
+		BruteForceSolver solver = new BruteForceSolver(grid);
 		
 		System.out.println("\nSolving...\n");
 		solver.start();

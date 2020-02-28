@@ -2,13 +2,13 @@ package sudokusolver;
 
 import java.util.HashSet;
 
-public class Solver {
+public class BruteForceSolver {
 	private int[][] grid;
 	private boolean[][] userInput;
 	private boolean[][][] historyMatrix;
 	private boolean ableToWriteNumber;
 	
-	public Solver(int[][] grid){
+	public BruteForceSolver(int[][] grid){
 		this.grid = grid;
 		this.historyMatrix = new boolean[9][9][9];
 		this.userInput = new boolean[9][9];
@@ -89,14 +89,17 @@ public class Solver {
 		historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 		
 		System.out.println("Now trying all values at " + backTrackCoord);
-		tryAllValues(backTrackCoord);
+		tryAllValues(backTrackCoord, prevVal);
 	}
 	
+//	public void tryAllValues(Coord currentCoord){
+//		tryAllValues(currentCoord, 1);
+//	}
 	
-	public void tryAllValues(Coord currentCoord){
+	public void tryAllValues(Coord currentCoord){//, int startingValue){
 		int row = currentCoord.getRow();
 		int col = currentCoord.getCol();
-		for (int i = 1; i <= 9; i++){
+		for (int i = startingValue + 1; i <= 9; i++){
 			if (historyMatrix[row][col][i - 1] == true){
 				System.out.println("Skip: " + i);
 				continue;
