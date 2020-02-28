@@ -15,7 +15,7 @@ public class UserInterface {
 		System.out.println("\nSolving...\n");
 		System.out.println("====================================================");
 		double timeStart = System.currentTimeMillis();
-		solver.start();
+		solver.run();
 		double timeElapsed = (double)(System.currentTimeMillis() - timeStart) / 1000.000;
 		System.out.println("\n\n\nSOLVED in " + timeElapsed + " seconds \n\n");
 		printMatrix();

@@ -12,6 +12,7 @@ public class BruteForceSolver {
 		this.userInput = new boolean[9][9];
 		this.ableToWriteNumber = true;
 		
+		// User input stores initial values that cannot be overwritten
 		for (int i = 0; i < 9; i ++){
 			for(int j = 0; j < 9; j++){
 				if (this.grid[i][j] != 0){
@@ -23,22 +24,17 @@ public class BruteForceSolver {
 		}
 	}
 	
-	
-	
-	public void start(){
-		
+	public void run(){
 		boolean needToBackTrack;
 		
 		outerloop:
 		while(true){
-			// Go Forward
+			// Go forward
 			forwardTrack();
 			needToBackTrack = !ableToWriteNumber;
 			
-			// If need to backtrack, then backtrack until good number is found, 
-			// then forward track until back at original spot. 
+			// Go backwards
 			if(needToBackTrack){
-
 				int backtrackingCounter = 0;
 				do {
 					do {
@@ -53,17 +49,14 @@ public class BruteForceSolver {
 						if (isBoardComplete()) break outerloop;
 					}while(ableToWriteNumber);
 				}while(backtrackingCounter > 0);
-				
 			}
 		}
 	}
-	
 	
 	public void forwardTrack(){
 		Coord currentCoord = findNextOpenSpot();
 		tryAllValues(currentCoord);
 	}
-	
 	
 	public void backTrack(){
 		Coord backTrackCoord = findPrevOpenSpot();
@@ -92,14 +85,12 @@ public class BruteForceSolver {
 		ableToWriteNumber = false;
 	}
 	
-	
 	public Coord findPrevOpenSpot(){
 		Coord currentCoord = findNextOpenSpot();
-		
 		int currentRow = currentCoord.getRow();
 		int currentCol = currentCoord.getCol();
 		
-		//Go to previous spot
+		//Go to previous spot (not necessarily open)
 		if (currentCol != 0) {
 			currentCol--;
 		}else{
@@ -107,7 +98,7 @@ public class BruteForceSolver {
 			currentCol = 8;
 		}
 		
-		// Find previous spot that was not occupied by user input
+		// Search backwards to find spot not occupied by user input
 		boolean beginningSearch = true;
 		for (int row = currentRow; row >= 0; row--){
 			for (int col = 8; col >= 0; col--){
@@ -118,6 +109,7 @@ public class BruteForceSolver {
 					beginningSearch = false;
 				}
 				
+				// If there is no user input there, it is open
 				if (!userInput[row][col]) {
 					return new Coord(row, col);
 				}
@@ -128,7 +120,6 @@ public class BruteForceSolver {
 	}
 	
 	public Coord findNextOpenSpot(){
-		
 		for (int row = 0; row < 9; row++){
 			for (int col = 0; col < 9; col++){
 				if (grid[row][col] == 0) {
@@ -138,18 +129,17 @@ public class BruteForceSolver {
 		}
 		return null;
 	}
-	
 
 	public boolean legalMove(int val, Coord coord){
-		
 		int row = coord.getRow();
 		int col = coord.getCol();
 		
-		// Check row and column
 		for (int i = 0; i < 9; i++){
+			// Check entire column
 			if (grid[i][col] == val) {
 				return false;
 			}
+			// Check entire row
 			if (grid[row][i] == val) {
 				return false;
 			}
@@ -159,27 +149,13 @@ public class BruteForceSolver {
 		int rowStart = row - (row % 3);
 		int colStart = col - (col % 3);
 		
+		// Check all 9 spaces in the small box
 		for (int i = 0; i < 3; i++){
 			for (int j = 0; j < 3; j++){
 				if (grid[rowStart + i][colStart + j] == val) {
 					return false;
 				}
 			}
-		}
-		
-		return true;
-	}
-	
-	public boolean isBoardComplete(){
-		if (findNextOpenSpot() == null) return true;
-		return false;
-	}
-	
-	public boolean isBoardSolved(){
-		for (int i = 0; i < 9; i++){
-			if (!isRowSolved(i)) return false;
-			if (!isColSolved(i)) return false;
-			if (!isSmallBoxSolved(i + 1)) return false;
 		}
 		return true;
 	}
@@ -205,13 +181,9 @@ public class BruteForceSolver {
 		return false;
 	}
 	
-	
-	/**
-	 * 
-	 * @param box: 1 for top left, 2 top center, ... , 9 for bottom right
-	 */
 	public boolean isSmallBoxSolved(int box){
-
+		// @param box: 1 for top left, 2 top center, ... , 9 for bottom right
+		
 		// Convert box number into top left coordinate of the box
 		int rowStart = 1;
 		if (box < 4) rowStart = 0;
@@ -232,36 +204,9 @@ public class BruteForceSolver {
 		if (repeatCheck.size() == 9) return true;
 		return false;
 	}
-	
-	
 
-	public void clearMatrix(boolean[][][] matrix){
-		for (int i = 0; i < matrix.length; i++){
-			for (int j = 0; j < matrix[i].length; j++){
-				for (int k = 0; k < matrix[i][j].length; k++){
-					matrix[i][j][k] = false;
-				}
-			}
-		}
+	public boolean isBoardComplete(){
+		if (findNextOpenSpot() == null) return true;
+		return false;
 	}
-	
-	public void printMatrix(){
-		System.out.println("\n\n");
-		for (int i = 0; i < grid.length; i++){
-			for (int j = 0; j < grid[i].length; j++){
-				System.out.print(grid[i][j]);
-				if(j % 3 == 2) {
-					System.out.print("   |    ");
-				}else{
-					System.out.print("\t");
-				}
-			}
-			if(i % 3 == 2) {
-				System.out.println("\n____________________________________________________________________");
-			}else{
-				System.out.println("\n");
-			}
-		}
-	}
-	
 }
