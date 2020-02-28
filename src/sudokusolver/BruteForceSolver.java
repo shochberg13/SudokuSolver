@@ -33,25 +33,22 @@ public class BruteForceSolver {
 			// Go Forward
 			forwardTrack();
 			needToBackTrack = !ableToWriteNumber;
-			printMatrix();
 			
 			// If need to backtrack, then backtrack until good number is found, 
 			// then forward track until back at original spot. 
 			if(needToBackTrack){
 
 				int backtrackingCounter = 0;
-				System.out.println("BacktrackCounter: " + backtrackingCounter);
 				do {
 					do {
 						backTrack();
+						
 						if (!ableToWriteNumber) backtrackingCounter++;
-						System.out.println("BacktrackCounter: " + backtrackingCounter);
 					}while(!ableToWriteNumber);
 					
 					do {
 						forwardTrack();
 						if(ableToWriteNumber) backtrackingCounter--;
-						System.out.println("BacktrackCounter: " + backtrackingCounter);
 					}while(ableToWriteNumber);
 					
 				}while(backtrackingCounter > 0);
@@ -64,22 +61,20 @@ public class BruteForceSolver {
 	
 	
 	public void forwardTrack(){
-		System.out.println("Going forward!");
 		Coord currentCoord = findNextOpenSpot();
-		System.out.println("Now trying all values at " + currentCoord);
 		tryAllValues(currentCoord);
+		printMatrix();
 	}
 	
 	
 	public void backTrack(){
-		System.out.println("Going backwards!");
 		Coord backTrackCoord = findPrevOpenSpot();
 		int prevRow = backTrackCoord.getRow();
 		int prevCol = backTrackCoord.getCol();
 		int prevVal = grid[prevRow][prevCol];
 		
-		System.out.println("Now trying all values at " + backTrackCoord);
 		tryAllValues(backTrackCoord, prevVal);
+		printMatrix();
 	}
 	
 	public void tryAllValues(Coord currentCoord){
@@ -93,7 +88,6 @@ public class BruteForceSolver {
 			if (legalMove(i, currentCoord)){
 				grid[row][col] = i;
 				ableToWriteNumber = true;
-				System.out.println("SUCCESS");
 				return;
 			}
 		}
@@ -128,7 +122,6 @@ public class BruteForceSolver {
 				}
 				
 				if (!userInput[row][col]) {
-					System.out.println("Found an open spot: " + new Coord(row, col));
 					return new Coord(row, col);
 				}
 			}
@@ -141,7 +134,10 @@ public class BruteForceSolver {
 		
 		for (int row = 0; row < 9; row++){
 			for (int col = 0; col < 9; col++){
-				if (grid[row][col] == 0) return new Coord(row, col);
+				if (grid[row][col] == 0) {
+//					System.out.println("Board needs work. Going to next open spot: " + new Coord(row, col));
+					return new Coord(row, col);
+				}
 			}
 		}
 		System.out.println("Board is complete");
@@ -157,11 +153,9 @@ public class BruteForceSolver {
 		// Check row and column
 		for (int i = 0; i < 9; i++){
 			if (grid[i][col] == val) {
-				System.out.println("Matched " + val + " in the same column! Culprit location: [" + i + "," + col + "]");
 				return false;
 			}
 			if (grid[row][i] == val) {
-				System.out.println("Matched " + val + "  in the same row! Culprit location: [" + row + "," + i + "]");
 				return false;
 			}
 		}
@@ -173,7 +167,6 @@ public class BruteForceSolver {
 		for (int i = 0; i < 3; i++){
 			for (int j = 0; j < 3; j++){
 				if (grid[rowStart + i][colStart + j] == val) {
-					System.out.println("Matched " + val + "  in the same box! Culprit location (within small box: [" + i + "," + j + "]");
 					return false;
 				}
 			}
