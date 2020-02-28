@@ -29,7 +29,8 @@ public class BruteForceSolver {
 		
 		boolean needToBackTrack;
 		
-		while(!isBoardComplete()){
+		outerloop:
+		while(true){
 			// Go Forward
 			forwardTrack();
 			needToBackTrack = !ableToWriteNumber;
@@ -42,28 +43,25 @@ public class BruteForceSolver {
 				do {
 					do {
 						backTrack();
-						
 						if (!ableToWriteNumber) backtrackingCounter++;
+						if (isBoardComplete()) break outerloop;
 					}while(!ableToWriteNumber);
 					
 					do {
 						forwardTrack();
 						if(ableToWriteNumber) backtrackingCounter--;
+						if (isBoardComplete()) break outerloop;
 					}while(ableToWriteNumber);
-					
 				}while(backtrackingCounter > 0);
 				
 			}
 		}
-		
-		printMatrix();
 	}
 	
 	
 	public void forwardTrack(){
 		Coord currentCoord = findNextOpenSpot();
 		tryAllValues(currentCoord);
-		printMatrix();
 	}
 	
 	
@@ -74,7 +72,6 @@ public class BruteForceSolver {
 		int prevVal = grid[prevRow][prevCol];
 		
 		tryAllValues(backTrackCoord, prevVal);
-		printMatrix();
 	}
 	
 	public void tryAllValues(Coord currentCoord){
@@ -135,12 +132,10 @@ public class BruteForceSolver {
 		for (int row = 0; row < 9; row++){
 			for (int col = 0; col < 9; col++){
 				if (grid[row][col] == 0) {
-//					System.out.println("Board needs work. Going to next open spot: " + new Coord(row, col));
 					return new Coord(row, col);
 				}
 			}
 		}
-		System.out.println("Board is complete");
 		return null;
 	}
 	

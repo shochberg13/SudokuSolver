@@ -13,8 +13,11 @@ public class UserInterface {
 		BruteForceSolver solver = new BruteForceSolver(grid);
 		
 		System.out.println("\nSolving...\n");
+		System.out.println("====================================================");
+		double timeStart = System.currentTimeMillis();
 		solver.start();
-		
+		double timeElapsed = (double)(System.currentTimeMillis() - timeStart) / 1000.000;
+		System.out.println("\n\n\nSOLVED in " + timeElapsed + " seconds \n\n");
 		printMatrix();
 	}
 	
