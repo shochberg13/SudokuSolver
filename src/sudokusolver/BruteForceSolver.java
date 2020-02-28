@@ -5,12 +5,10 @@ import java.util.HashSet;
 public class BruteForceSolver {
 	private int[][] grid;
 	private boolean[][] userInput;
-	private boolean[][][] historyMatrix;
 	private boolean ableToWriteNumber;
 	
 	public BruteForceSolver(int[][] grid){
 		this.grid = grid;
-		this.historyMatrix = new boolean[9][9][9];
 		this.userInput = new boolean[9][9];
 		this.ableToWriteNumber = true;
 		
@@ -31,9 +29,7 @@ public class BruteForceSolver {
 		
 		boolean needToBackTrack;
 		
-		int spot = 0;
 		while(!isBoardComplete()){
-			System.out.println("SPOT: " + (++spot));
 			// Go Forward
 			forwardTrack();
 			needToBackTrack = !ableToWriteNumber;
@@ -45,20 +41,15 @@ public class BruteForceSolver {
 
 				int backtrackingCounter = 0;
 				System.out.println("BacktrackCounter: " + backtrackingCounter);
-				clearMatrix(historyMatrix);
-
-				
 				do {
 					do {
 						backTrack();
-						printMatrix();
-						if (!ableToWriteNumber)backtrackingCounter++;
+						if (!ableToWriteNumber) backtrackingCounter++;
 						System.out.println("BacktrackCounter: " + backtrackingCounter);
 					}while(!ableToWriteNumber);
 					
 					do {
 						forwardTrack();
-						printMatrix();
 						if(ableToWriteNumber) backtrackingCounter--;
 						System.out.println("BacktrackCounter: " + backtrackingCounter);
 					}while(ableToWriteNumber);
@@ -86,28 +77,19 @@ public class BruteForceSolver {
 		int prevRow = backTrackCoord.getRow();
 		int prevCol = backTrackCoord.getCol();
 		int prevVal = grid[prevRow][prevCol];
-		historyMatrix[prevRow][prevCol][prevVal - 1] = true;
 		
 		System.out.println("Now trying all values at " + backTrackCoord);
 		tryAllValues(backTrackCoord, prevVal);
 	}
 	
-//	public void tryAllValues(Coord currentCoord){
-//		tryAllValues(currentCoord, 1);
-//	}
+	public void tryAllValues(Coord currentCoord){
+		tryAllValues(currentCoord, 0);
+	}
 	
-	public void tryAllValues(Coord currentCoord){//, int startingValue){
+	public void tryAllValues(Coord currentCoord, int startingValue){
 		int row = currentCoord.getRow();
 		int col = currentCoord.getCol();
 		for (int i = startingValue + 1; i <= 9; i++){
-			if (historyMatrix[row][col][i - 1] == true){
-				System.out.println("Skip: " + i);
-				continue;
-			}else {
-				System.out.println("Try: " + i);
-			}
-			
-
 			if (legalMove(i, currentCoord)){
 				grid[row][col] = i;
 				ableToWriteNumber = true;
